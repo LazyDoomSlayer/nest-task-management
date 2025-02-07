@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from './task.entity';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { TasksRepository } from './tasks.repository';
+import { UpdateTaskDto } from './dtos/update-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -53,22 +54,18 @@ export class TasksService {
     }
   }
 
-  //
-  //   updateTaskById(id: string, updateTaskDto: UpdateTaskDto): ITask | undefined {
-  //     const { status } = updateTaskDto;
-  //     const index = this.tasks.findIndex((value) => value.id === id);
-  //     if (index === -1) {
-  //       return undefined;
-  //     }
-  //
-  //     try {
-  //       this.tasks[index].status = status;
-  //
-  //       return this.tasks[index];
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //
-  //     return undefined;
-  //   }
+  async updateTaskById(
+    id: string,
+    updateTaskDto: UpdateTaskDto,
+  ): Promise<Task> {
+    const task = await this.getTaskById(id);
+
+    task.title = updateTaskDto.title;
+    task.description = updateTaskDto.description;
+    task.status = updateTaskDto.status;
+
+    await this.tasksRepository.save(task);
+
+    return task;
+  }
 }
