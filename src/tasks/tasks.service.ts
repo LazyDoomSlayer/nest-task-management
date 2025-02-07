@@ -1,14 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from './task.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { CreateTaskDto } from './dtos/create-task.dto';
+import { TasksRepository } from './tasks.repository';
 
 @Injectable()
 export class TasksService {
-  constructor(
-    @InjectRepository(Task)
-    private tasksRepository: Repository<Task>,
-  ) {}
+  constructor(private readonly tasksRepository: TasksRepository) {}
 
   //   getAllsTasks(): ITask[] {
   //     return this.tasks;
@@ -34,23 +31,12 @@ export class TasksService {
   //     return tasks;
   //   }
   //
-  //   createTask(createTaskDto: CreateTaskDto): ITask {
-  //     const { title, descriptioError: Nn } = createTaskDto;
-  //
-  //     const task: ITask = {
-  //       id: uuid(),
-  //       title,
-  //       description,
-  //       status: ETaskStatus.OPEN,
-  //     };
-  //
-  //     this.tasks.push(task);
-  //
-  //     return task;
-  //   }
-  //
+  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return await this.tasksRepository.createTask(createTaskDto);
+  }
+
   async getTaskById(id: string): Promise<Task> {
-    const found = await this.tasksRepository.findOne({ where: { id } });
+    const found = await this.tasksRepository.findById(id);
 
     if (!found) {
       throw new NotFoundException(`Task could not be found with id: ${id}`);
@@ -59,11 +45,14 @@ export class TasksService {
     return found;
   }
 
-  //   deleteTaskById(id: string) {
-  //     const task = this.getTaskById(id);
-  //
-  //     this.tasks = this.tasks.filter((value) => value.id !== task?.id);
-  //   }
+  async deleteTaskById(id: string): Promise<void> {
+    const result = await this.tasksRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task could not be found with id: ${id}`);
+    }
+  }
+
   //
   //   updateTaskById(id: string, updateTaskDto: UpdateTaskDto): ITask | undefined {
   //     const { status } = updateTaskDto;

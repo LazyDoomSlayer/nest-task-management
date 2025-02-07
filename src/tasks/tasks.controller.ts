@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { Task } from './task.entity';
+import { CreateTaskDto } from './dtos/create-task.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -16,14 +17,14 @@ export class TasksController {
   // }
   //
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.tasksService.getTaskById(id);
+  async getTaskById(@Param('id') id: string): Promise<Task> {
+    return await this.tasksService.getTaskById(id);
   }
 
-  // @Delete('/:id')
-  // deleteTaskById(@Param('id') id: string) {
-  //   this.tasksService.deleteTaskById(id);
-  // }
+  @Delete('/:id')
+  async deleteTaskById(@Param('id') id: string): Promise<void> {
+    return await this.tasksService.deleteTaskById(id);
+  }
   //
   // @Patch('/:id')
   // updateTaskById(
@@ -33,8 +34,8 @@ export class TasksController {
   //   return this.tasksService.updateTaskById(id, updateTaskDto);
   // }
   //
-  // @Post()
-  // createTask(@Body() createTaskDto: CreateTaskDto): ITask {
-  //   return this.tasksService.createTask(createTaskDto);
-  // }
+  @Post()
+  async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
+    return await this.tasksService.createTask(createTaskDto);
+  }
 }
