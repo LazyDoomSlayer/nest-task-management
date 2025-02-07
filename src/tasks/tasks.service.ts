@@ -3,35 +3,16 @@ import { Task } from './task.entity';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { TasksRepository } from './tasks.repository';
 import { UpdateTaskDto } from './dtos/update-task.dto';
+import { FilterTasksDto } from './dtos/filter-tasks.dto';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly tasksRepository: TasksRepository) {}
 
-  //   getAllsTasks(): ITask[] {
-  //     return this.tasks;
-  //   }
-  //
-  //   getFilteredTasks(filterTasksDto: FilterTasksDto): ITask[] {
-  //     const { description, title, status } = filterTasksDto;
-  //
-  //     let tasks: ITask[] = this.getAllsTasks();
-  //
-  //     if (description) {
-  //       tasks = tasks.filter((value) => value.description === description);
-  //     }
-  //
-  //     if (title) {
-  //       tasks = tasks.filter((value) => value.title === title);
-  //     }
-  //
-  //     if (status) {
-  //       tasks = tasks.filter((value) => value.status === status);
-  //     }
-  //
-  //     return tasks;
-  //   }
-  //
+  async getTasks(filterDto: FilterTasksDto): Promise<Task[]> {
+    return this.tasksRepository.getTasks(filterDto);
+  }
+
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
     return await this.tasksRepository.createTask(createTaskDto);
   }
