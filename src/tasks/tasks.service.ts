@@ -10,16 +10,16 @@ import { User } from 'src/auth/user.entity';
 export class TasksService {
   constructor(private readonly tasksRepository: TasksRepository) {}
 
-  async getTasks(filterDto: FilterTasksDto): Promise<Task[]> {
-    return this.tasksRepository.getTasks(filterDto);
+  async getTasks(filterDto: FilterTasksDto, user: User): Promise<Task[]> {
+    return this.tasksRepository.getTasks(filterDto, user);
   }
 
   async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     return await this.tasksRepository.createTask(createTaskDto, user);
   }
 
-  async getTaskById(id: string): Promise<Task> {
-    const found = await this.tasksRepository.findById(id);
+  async getTaskById(id: string, user: User): Promise<Task> {
+    const found = await this.tasksRepository.findById(id, user);
 
     if (!found) {
       throw new NotFoundException(`Task could not be found with id: ${id}`);
@@ -28,8 +28,8 @@ export class TasksService {
     return found;
   }
 
-  async deleteTaskById(id: string): Promise<void> {
-    const result = await this.tasksRepository.delete(id);
+  async deleteTaskById(id: string, user: User): Promise<void> {
+    const result = await this.tasksRepository.delete({ id, user });
 
     if (result.affected === 0) {
       throw new NotFoundException(`Task could not be found with id: ${id}`);
@@ -39,8 +39,9 @@ export class TasksService {
   async updateTaskById(
     id: string,
     updateTaskDto: UpdateTaskDto,
+    user: User,
   ): Promise<Task> {
-    const task = await this.getTaskById(id);
+    const task = await this.getTaskById(id, user);
 
     task.title = updateTaskDto.title;
     task.description = updateTaskDto.description;
