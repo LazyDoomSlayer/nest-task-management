@@ -1,7 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { User } from './user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { ERROR_CODE_FOR_DUBLICATE } from 'src/assets/constants';
+import { EAuthErrorMessages } from './auth.enum';
 
 @Injectable()
 export class UsersRepository extends Repository<User> {
@@ -17,6 +23,14 @@ export class UsersRepository extends Repository<User> {
       password,
     });
 
-    await this.save(user);
+    try {
+      await this.save(user);
+    } catch (error: unknown) {
+      if ((error as { code?: string })?.code === ERROR_CODE_FOR_DUBLICATE) {
+        throw new ConflictException(EAuthErrorMessages.USER_EXISTS);
+      }
+
+      throw new InternalServerErrorException();
+    }
   }
 }
