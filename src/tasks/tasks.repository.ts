@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { ETaskStatus } from './task-status.enum';
 import { FilterTasksDto } from './dtos/filter-tasks.dto';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class TasksRepository extends Repository<Task> {
@@ -39,10 +40,12 @@ export class TasksRepository extends Repository<Task> {
     return await this.findOne({ where: { id } });
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     const { title, description } = createTaskDto;
 
     const task = this.create({
+      user,
+      // params
       title,
       description,
       status: ETaskStatus.OPEN,
